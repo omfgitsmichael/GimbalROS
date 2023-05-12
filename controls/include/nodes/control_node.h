@@ -1,13 +1,18 @@
 #pragma once
 
+// Standard includes
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
 
-#include "rclcpp/rclcpp.hpp"
-#include "messages/msg/control.hpp"
-#include "messages/msg/attitude_estimation.hpp"
+// ROS Includes
+#include <rclcpp/rclcpp.hpp>
+#include <messages/msg/control.hpp>
+#include <messages/msg/attitude_estimation.hpp>
+
+// Other Library includes
+#include <attitude_libraries/controllers/passivityBasedAdaptiveControl.h>
 
 namespace controls{
 
@@ -48,7 +53,7 @@ class ControlNode : public rclcpp::Node
     // Subscribers
     rclcpp::Subscription<messages::msg::AttitudeEstimation>::SharedPtr estimationSubscriber_;
 
-    // Various Member Variavles
+    // Various Member Variables
 };
 
 } // namespace controls

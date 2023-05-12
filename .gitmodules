@@ -1,0 +1,3 @@
+[submodule "attitude_libraries"]
+	path = attitude_libraries
+	url = git@github.com:omfgitsmichael/attitude_libraries.git

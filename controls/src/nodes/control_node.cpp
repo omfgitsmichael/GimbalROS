@@ -29,6 +29,9 @@ void ControlNode::controllerCallback()
 
 void ControlNode::estimationCallback(const messages::msg::AttitudeEstimation& msg)
 {
+  attitude::Quaternion<double> quat = attitude::Quaternion<double>::Zero();
+  quat(0) = msg.quat.vector[0];
+
   // RCLCPP_INFO(this->get_logger(), "I heard:"); // Keeping this line so I know how to use logger
 }
 

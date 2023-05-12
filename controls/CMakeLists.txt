@@ -9,10 +9,15 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(messages REQUIRED)
+find_package(attitude_libraries REQUIRED)
 
 add_executable(control_node src/nodes/control_node.cpp)
 
-ament_target_dependencies(control_node rclcpp messages)
+ament_target_dependencies(control_node
+  rclcpp
+  messages
+  "attitude_libraries"
+)
 
 target_include_directories(control_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
