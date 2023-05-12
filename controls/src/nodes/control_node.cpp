@@ -17,22 +17,56 @@ ControlNode::ControlNode() : Node("control_node")
 
 void ControlNode::controllerCallback()
 {
-  auto message = messages::msg::Control();
-  message.torque[0] = 0.0;
-  message.torque[1] = 0.0;
-  message.torque[2] = 0.0;
-  message.valid = false;
+  // Create copies of the current data sets
+  const EstimationData estimationData = this->getEstimationData();
 
-  // RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str()); // Keeping this line so I know how to use logger
-  controlPublisher_->publish(message);
+  // if the system is not engaged or any of the data is invalid then return early without publishing data
+  if (!estimationData.valid){
+    return;
+  }
+
+  // Populate the controller data and then run the controller
+  populateControllerData(estimationData);
+
+  bool result = passivityBasedAdaptiveControl(params_, data_);
+
+  if (result) {
+    auto message = messages::msg::Control();
+    message.torque[0] = data_.u(0);
+    message.torque[1] = data_.u(1);
+    message.torque[2] = data_.u(2);
+    message.valid = true;
+
+    controlPublisher_->publish(message);
+  }
 }
 
 void ControlNode::estimationCallback(const messages::msg::AttitudeEstimation& msg)
 {
-  attitude::Quaternion<double> quat = attitude::Quaternion<double>::Zero();
-  quat(0) = msg.quat.vector[0];
+  estimationData_.valid = false;
+  if (!msg.valid) {
+    RCLCPP_INFO(this->get_logger(), "ControlNode::Estimation data is not valid!");
 
-  // RCLCPP_INFO(this->get_logger(), "I heard:"); // Keeping this line so I know how to use logger
+    return;
+  }
+
+  estimationData_.valid = msg.valid;
+
+  estimationData_.quat(0) = msg.quat.vector[0];
+  estimationData_.quat(1) = msg.quat.vector[1];
+  estimationData_.quat(2) = msg.quat.vector[2];
+  estimationData_.quat(3) = msg.quat.scalar;
+
+  estimationData_.omega(0) = msg.omega.x;
+  estimationData_.omega(1) = msg.omega.y;
+  estimationData_.omega(2) = msg.omega.z;
+}
+
+void ControlNode::populateControllerData(const EstimationData& estimation)
+{
+  // Populate the necessary state estimation data
+  data_.quat = estimation.quat;
+  data_.omega = estimation.omega;
 }
 
 } // namespace controls

@@ -23,6 +23,15 @@ class ControlNode : public rclcpp::Node
 {
   public:
     /**
+    * Structure for incoming attitude state estimation data.
+    **/
+    struct EstimationData {
+      attitude::Quaternion<double> quat = attitude::Quaternion<double>::Zero();
+      attitude::BodyRate<double> omega = attitude::BodyRate<double>::Zero();
+      bool valid = false;
+    };
+
+    /**
     * Control node class contrstructor.
     * Input:
     * Output:
@@ -30,6 +39,16 @@ class ControlNode : public rclcpp::Node
     ControlNode();
 
   private:
+    /**
+    * Returns a copy of the state estimation data.
+    * Input:
+    * Output: EstimationData
+    **/
+    EstimationData getEstimationData() const
+    {
+      return estimationData_;
+    }
+  
     /**
     * Controls publisher callback function.
     * Input:
@@ -43,6 +62,13 @@ class ControlNode : public rclcpp::Node
     * Output:
     **/
     void estimationCallback(const messages::msg::AttitudeEstimation& msg);
+
+    /**
+    * Populate the controller data structure with the necessary informarion.
+    * Input:estimation - Copy of the current attitude state estimation data.
+    * Output:
+    **/
+    void populateControllerData(const EstimationData& estimation);
     
     // ROS Timers
     rclcpp::TimerBase::SharedPtr controlTimer_;
@@ -53,9 +79,12 @@ class ControlNode : public rclcpp::Node
     // Subscribers
     rclcpp::Subscription<messages::msg::AttitudeEstimation>::SharedPtr estimationSubscriber_;
 
-    // Various Member Variables
+    // Controller params and data
     attitude::control::PassivityParams<double> params_;
     attitude::control::PassivityControlData<double> data_;
+
+    // Various member variables
+    EstimationData estimationData_;
 };
 
 } // namespace controls
