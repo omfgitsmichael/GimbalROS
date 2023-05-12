@@ -54,6 +54,8 @@ class ControlNode : public rclcpp::Node
     rclcpp::Subscription<messages::msg::AttitudeEstimation>::SharedPtr estimationSubscriber_;
 
     // Various Member Variables
+    attitude::control::PassivityParams<double> params_;
+    attitude::control::PassivityControlData<double> data_;
 };
 
 } // namespace controls
