@@ -14,9 +14,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Quaternion.msg"
   "msg/BodyRates.msg"
   "msg/AttitudeEstimation.msg"
+  
+  # Attitude generator messages
+  "msg/DesiredAttitude.msg"
 
   # Controls messages
   "msg/Control.msg"
+
+  # CAN messages
+  "msg/SystemEngaged.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

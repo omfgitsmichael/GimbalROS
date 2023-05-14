@@ -4,5 +4,5 @@ Quaternion quat
 # Angular body rate message information
 BodyRates omega
 
-# Message stating if the attitude estimation message is valid
+# Boolean stating if the attitude estimation message is valid
 bool valid
