@@ -4,6 +4,10 @@ namespace controls{
 
 ControlNode::ControlNode() : Node("control_node")
 {
+  auto controllerRegistry = registry::controllerRegistry<double>();
+
+  controller_ = controllerRegistry.at("passivityBasedAdaptiveControl");
+
   // Set up the publishers
   controlPublisher_ = this->create_publisher<messages::msg::Control>("control_topic", 10);
 
@@ -41,7 +45,7 @@ void ControlNode::controllerCallback()
   // Populate the controller data and then run the controller
   this->populateControllerData(estimationData, desiredData);
 
-  bool result = passivityBasedAdaptiveControl(params_, data_);
+  bool result = controller_(params_, data_);
 
   auto message = messages::msg::Control();
   if (result) {

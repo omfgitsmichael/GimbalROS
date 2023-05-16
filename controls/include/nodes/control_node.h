@@ -14,7 +14,7 @@
 #include <messages/msg/system_engaged.hpp>
 
 // Other Library includes
-#include <attitude_libraries/controllers/passivityBasedAdaptiveControl.h>
+#include <attitude_libraries/registry/controllerFunctionRegistry.h>
 
 namespace controls{
 
@@ -143,7 +143,8 @@ class ControlNode : public rclcpp::Node
     rclcpp::Subscription<messages::msg::DesiredAttitude>::SharedPtr attitudeGenerationSubscriber_;
     rclcpp::Subscription<messages::msg::SystemEngaged>::SharedPtr systemEngagedSubscriber_;
 
-    // Controller params and data
+    // Controller member variables
+    registry::controllerFunc<double> controller_;
     attitude::control::PassivityParams<double> params_;
     attitude::control::PassivityControlData<double> data_;
 
