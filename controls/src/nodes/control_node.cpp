@@ -6,7 +6,10 @@ ControlNode::ControlNode() : Node("control_node")
 {
   auto controllerRegistry = registry::controllerRegistry<double>();
 
+  // Initialize the controller params
   controller_ = controllerRegistry.at("passivityBasedAdaptiveControl");
+  params_ = std::make_shared<attitude::BaseParams<double>>();
+  data_ = std::make_shared<attitude::ControllerData<double>>();
 
   // Set up the publishers
   controlPublisher_ = this->create_publisher<messages::msg::Control>("control_topic", 10);
@@ -45,15 +48,15 @@ void ControlNode::controllerCallback()
   // Populate the controller data and then run the controller
   this->populateControllerData(estimationData, desiredData);
 
-  bool result = controller_(params_, data_);
+  bool result = controller_(*params_, *data_);
 
   auto message = messages::msg::Control();
   if (result) {
-    previousControl_ = data_.u;
+    previousControl_ = data_->u;
 
-    message.torque[0] = data_.u(0);
-    message.torque[1] = data_.u(1);
-    message.torque[2] = data_.u(2);
+    message.torque[0] = data_->u(0);
+    message.torque[1] = data_->u(1);
+    message.torque[2] = data_->u(2);
     message.controller_valid = true;
   } else {
     this->reset();
@@ -127,19 +130,20 @@ void ControlNode::systemEngagedCallback(const messages::msg::SystemEngaged& msg)
 void ControlNode::populateControllerData(const EstimationData& estimation, const DesiredData& desired)
 {
   // Populate the necessary state estimation data
-  data_.quat = estimation.quat;
-  data_.omega = estimation.omega;
+  data_->quat = estimation.quat;
+  data_->omega = estimation.omega;
 
   // Populate the necessary desired attitude information
-  data_.quatDesired = desired.quat;
-  data_.omegaDesired = desired.omega;
-  data_.omegaDotDesired = desired.omegaDot;
+  data_->quatDesired = desired.quat;
+  data_->omegaDesired = desired.omega;
+  data_->omegaDotDesired = desired.omegaDot;
 }
 
 void ControlNode::reset()
 {
-  data_.u = attitude::Control<double>::Zero();
-  data_.theta = attitude::control::Theta<double>::Zero();
+  // TODO::Michael::Need to add a function registry for controller reset functions.
+  // data_->u = attitude::Control<double>::Zero();
+  // data_->theta = attitude::control::Theta<double>::Zero();
 }
 
 } // namespace controls

@@ -145,8 +145,8 @@ class ControlNode : public rclcpp::Node
 
     // Controller member variables
     registry::controllerFunc<double> controller_;
-    attitude::control::PassivityParams<double> params_;
-    attitude::control::PassivityControlData<double> data_;
+    std::shared_ptr<attitude::BaseParams<double>> params_;
+    std::shared_ptr<attitude::ControllerData<double>> data_;
 
     // Various member variables
     EstimationData estimationData_;
