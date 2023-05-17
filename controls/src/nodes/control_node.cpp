@@ -5,9 +5,11 @@ namespace controls{
 ControlNode::ControlNode() : Node("control_node")
 {
   auto controllerRegistry = registry::controllerRegistry<double>();
+  auto controllerResetRegistry = registry::controllerResetRegistry<double>();
 
   // Initialize the controller params
   controller_ = controllerRegistry.at("passivityBasedAdaptiveControl");
+  reset_ = controllerResetRegistry.at("passivityBasedAdaptiveControlReset");
   params_ = std::make_shared<attitude::BaseParams<double>>();
   data_ = std::make_shared<attitude::ControllerData<double>>();
 
@@ -141,9 +143,8 @@ void ControlNode::populateControllerData(const EstimationData& estimation, const
 
 void ControlNode::reset()
 {
-  // TODO::Michael::Need to add a function registry for controller reset functions.
-  // data_->u = attitude::Control<double>::Zero();
-  // data_->theta = attitude::control::Theta<double>::Zero();
+  data_->u = attitude::Control<double>::Zero();
+  reset_(*data_);
 }
 
 } // namespace controls

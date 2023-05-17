@@ -145,6 +145,7 @@ class ControlNode : public rclcpp::Node
 
     // Controller member variables
     registry::controllerFunc<double> controller_;
+    registry::controllerResetFunc<double> reset_;
     std::shared_ptr<attitude::BaseParams<double>> params_;
     std::shared_ptr<attitude::ControllerData<double>> data_;
 
