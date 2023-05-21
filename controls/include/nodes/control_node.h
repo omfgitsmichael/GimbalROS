@@ -25,6 +25,14 @@ class ControlNode : public rclcpp::Node
 {
   public:
     /**
+    * Structure for ROS main static parameters which determine the reset of the params.
+    **/
+    struct StaticParams {
+      double controlRate = 0.01;
+      std::string controllerName = "PassivityBasedAdaptiveControl";
+    };
+
+    /**
     * Structure for incoming attitude state estimation data.
     **/
     struct EstimationData {
@@ -131,6 +139,27 @@ class ControlNode : public rclcpp::Node
     * Output:
     **/
     void reset();
+
+    /**
+    * Set up the node static parameters.
+    * Input:
+    * Output:
+    **/
+    void setStaticParams();
+
+    /**
+    * Initializes the controller information.
+    * Input:
+    * Output:
+    **/
+    void initializeControllerInformation();
+
+    /**
+    * Set up the node passivity based adaptive parameters.
+    * Input:
+    * Output:
+    **/
+    void setPassivityBasedAdaptiveControlParams();
     
     // ROS Timers
     rclcpp::TimerBase::SharedPtr controlTimer_;
@@ -150,6 +179,7 @@ class ControlNode : public rclcpp::Node
     std::shared_ptr<attitude::ControllerData<double>> data_;
 
     // Various member variables
+    StaticParams staticParams_;
     EstimationData estimationData_;
     DesiredData desiredData_;
     CANData canData_;

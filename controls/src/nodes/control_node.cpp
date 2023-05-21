@@ -4,14 +4,11 @@ namespace controls{
 
 ControlNode::ControlNode() : Node("control_node")
 {
-  auto controllerRegistry = registry::controllerRegistry<double>();
-  auto controllerResetRegistry = registry::controllerResetRegistry<double>();
+  // Initialize node static params
+  this->setStaticParams();
 
-  // Initialize the controller params
-  controller_ = controllerRegistry.at("passivityBasedAdaptiveControl");
-  reset_ = controllerResetRegistry.at("passivityBasedAdaptiveControlReset");
-  params_ = std::make_shared<attitude::BaseParams<double>>();
-  data_ = std::make_shared<attitude::ControllerData<double>>();
+  // Initialize the controller static params
+  this->initializeControllerInformation();
 
   // Set up the publishers
   controlPublisher_ = this->create_publisher<messages::msg::Control>("control_topic", 10);
@@ -27,7 +24,8 @@ ControlNode::ControlNode() : Node("control_node")
     "system_engaged_topic", 10, std::bind(&ControlNode::systemEngagedCallback, this, _1));
 
   // Set up the timers
-  controlTimer_ = this->create_wall_timer(20ms, std::bind(&ControlNode::controllerCallback, this));
+  controlTimer_ = this->create_wall_timer(
+    std::chrono::duration<double>(staticParams_.controlRate), std::bind(&ControlNode::controllerCallback, this));
 }
 
 void ControlNode::controllerCallback()
@@ -145,6 +143,73 @@ void ControlNode::reset()
 {
   data_->u = attitude::Control<double>::Zero();
   reset_(*data_);
+}
+
+void ControlNode::setStaticParams()
+{
+  this->declare_parameter("controlRate", 0.01);
+  this->declare_parameter("controllerName", "passivityBasedAdaptiveControl");
+
+  staticParams_.controlRate = this->get_parameter("controlRate").as_double();
+  staticParams_.controllerName = this->get_parameter("controllerName").as_string();
+}
+
+void ControlNode::initializeControllerInformation()
+{
+  auto controllerRegistry = registry::controllerRegistry<double>();
+  auto controllerResetRegistry = registry::controllerResetRegistry<double>();
+
+  controller_ = controllerRegistry.at(staticParams_.controllerName);
+  reset_ = controllerResetRegistry.at(staticParams_.controllerName + "Reset");
+  params_ = std::make_shared<attitude::BaseParams<double>>();
+  data_ = std::make_shared<attitude::ControllerData<double>>();
+
+  // Default to the passivity based adaptive control scheme
+  this->setPassivityBasedAdaptiveControlParams();
+}
+
+void ControlNode::setPassivityBasedAdaptiveControlParams()
+{
+  this->declare_parameter("lambda", std::vector<double>(3, 1.0));
+  this->declare_parameter("k", std::vector<double>(3, 2.0));
+  this->declare_parameter("gammaInv", std::vector<double>(3, 10.0));
+  this->declare_parameter("del", 0.5);
+  this->declare_parameter("e0", 0.025);
+  this->declare_parameter("epsilon", 0.5);
+  this->declare_parameter("thetaMax", 100.0);
+  this->declare_parameter("theta", std::vector<double>(3, 0.0));
+
+  std::shared_ptr<attitude::control::PassivityParams<double>> params = std::make_shared<attitude::control::PassivityParams<double>>();
+
+  const auto lambda = this->get_parameter("lambda").as_double_array();
+  for (unsigned int i = 0; i < lambda.size(); i++) {
+    params->lambda(i, i) = lambda[i];
+  }
+
+  const auto k = this->get_parameter("k").as_double_array();
+  for (unsigned int i = 0; i < k.size(); i++) {
+    params->k(i, i) = k[i];
+  }
+
+  const auto gammaInv = this->get_parameter("gammaInv").as_double_array();
+  for (unsigned int i = 0; i < gammaInv.size(); i++) {
+    params->gammaInv(i, i) = gammaInv[i];
+  }
+
+  params->deadzoneParams.del = this->get_parameter("del").as_double();
+  params->deadzoneParams.e0 = this->get_parameter("e0").as_double();
+  params->projectionParams.epsilon(0) = this->get_parameter("epsilon").as_double();
+  params->projectionParams.thetaMax(0) = this->get_parameter("thetaMax").as_double();
+
+  std::shared_ptr<attitude::control::PassivityControlData<double>> data = std::make_shared<attitude::control::PassivityControlData<double>>();
+
+  const auto theta = this->get_parameter("theta").as_double_array();
+  for (unsigned int i = 0; i < gammaInv.size(); i++) {
+    data->theta(i) = theta[i];
+  }
+
+  params_ = params;
+  data_ = data;
 }
 
 } // namespace controls

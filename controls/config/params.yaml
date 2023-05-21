@@ -1,15 +1,18 @@
 control_node:
   ros__parameters:
-    # Controller params
+    # Node params
+    controlRate: 0.01
+    controller: "passivityBasedAdaptiveControl"
+    reset: "passivityBasedAdaptiveControlReset"
+
+    # Required controller params
     lambda: [1.0, 1.0, 1.0]
     k: [2.0, 2.0, 2.0]
     gammaInv: [10.0, 10.0, 10.0]
+    del: 0.5 # deadzone params
+    e0: 0.025 # deadzone params
+    epsilon: 0.5 # projection params
+    thetaMax: 100.0 # Projection params
 
-    # Deadzone params
-    del: 0.5
-    e0: 0.025
-
-    # Projection params
-    epsilon: 0.5
-    thetaMax: 100.0
-    
+    # Initial parameter estimates
+    theta: [0.0, 0.0, 0.0]
