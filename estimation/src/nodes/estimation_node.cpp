@@ -1,10 +1,9 @@
-#include <cstdio>
+#include "nodes/estimation_node.h"
 
 int main(int argc, char ** argv)
 {
   (void) argc;
   (void) argv;
 
-  printf("hello world estimation package\n");
   return 0;
 }

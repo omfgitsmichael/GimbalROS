@@ -22,7 +22,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Control.msg"
 
   # CAN messages
+  "msg/AttitudeMeasurement.msg"
   "msg/SystemEngaged.msg"
+  "msg/SensorData.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)
