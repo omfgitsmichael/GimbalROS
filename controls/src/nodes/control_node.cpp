@@ -1,6 +1,6 @@
 #include "nodes/control_node.h"
 
-namespace controls{
+namespace controls {
 
 ControlNode::ControlNode() : Node("control_node")
 {
@@ -166,6 +166,9 @@ void ControlNode::initializeControllerInformation()
 
   // Default to the passivity based adaptive control scheme
   this->setPassivityBasedAdaptiveControlParams();
+
+  // Set base parameter information 
+  params_->dt = staticParams_.controlRate;
 }
 
 void ControlNode::setPassivityBasedAdaptiveControlParams()

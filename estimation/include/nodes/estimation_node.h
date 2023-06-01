@@ -14,7 +14,7 @@
 // Other Library includes
 #include <attitude_libraries/registry/filterFunctionRegistry.h>
 
-namespace estimation{
+namespace estimation {
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -28,6 +28,12 @@ class EstimationNode : public rclcpp::Node
     struct StaticParams {
       double filterRate = 0.01;
       std::string filterName = "AHRSKalmanFilter";
+
+      // Filter static params
+      double accelerometerNoise = 0.0;
+      double magnetometerNoise = 0.0;
+      double geomagneticFieldStength = 0.0;
+      double covarianceInitialValue = 0.0;
     };
 
     /**
@@ -118,7 +124,7 @@ class EstimationNode : public rclcpp::Node
     registry::filterFunc<double> filter_;
     registry::filterResetFunc<double> reset_;
     std::shared_ptr<attitude::BaseParams<double>> params_;
-    std::shared_ptr<attitude::ControllerData<double>> data_;
+    std::shared_ptr<attitude::FilterData<double>> data_;
 
     // Various member variables
     StaticParams staticParams_;

@@ -2,8 +2,7 @@ control_node:
   ros__parameters:
     # Node params
     controlRate: 0.01
-    controller: "passivityBasedAdaptiveControl"
-    reset: "passivityBasedAdaptiveControlReset"
+    controllerName: "passivityBasedAdaptiveControl"
 
     # Required controller params
     lambda: [1.0, 1.0, 1.0]

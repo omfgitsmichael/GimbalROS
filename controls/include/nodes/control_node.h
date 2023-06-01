@@ -16,7 +16,7 @@
 // Other Library includes
 #include <attitude_libraries/registry/controllerFunctionRegistry.h>
 
-namespace controls{
+namespace controls {
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;

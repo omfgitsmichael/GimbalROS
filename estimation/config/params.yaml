@@ -1,0 +1,22 @@
+estimation_node:
+  ros__parameters:
+    # Node params
+    filterRate: 0.01
+    filterName: "AHRSKalmanFilter"
+
+    # Covariance initial value
+    covarianceInitialValue: 100.0
+
+    # Required filter params - process noise
+    omegaProcessNoise: 0.5 # m / s 
+    biasProcessNoise: 0.5 # m / s 
+    linearAccelNoise: 0.5 # m / s / s
+    magDisturbanceNoise: 0.5 # microTesla
+
+    # Calibrated params
+    gravity: 9.81 # m / s / s
+    geomagneticFieldStrength: 50.0 # microTesla
+
+    # Measurement Noise Params
+    accelerometerNoise: 0.5 # m / s / s
+    magnetometerNoise: 0.5 # microTesla
